@@ -60,7 +60,7 @@ function stopRecording() {
 }
 
 function sendAudioData(data, fileName) {
-    const serverUrl = "https://hook.eu1.make.com/8lkm16qv5lhtcrr7589u88onya70uq6x";
+    const serverUrl = "https://hook.eu1.make.com/1y1ku32ezig5rezo6ab995olarcijhcx";
     const formData = new FormData();
     formData.set('file', data, fileName);
     fetch(serverUrl, { method: "POST", body:  formData})
