@@ -41,7 +41,7 @@
 </style>
 
 <script>
-  const recordBtn = document.getElementById('recordBtn');
+const recordBtn = document.getElementById('recordBtn');
   const audio = document.getElementById('audio');
   let recorder;
   let audioStream;
@@ -70,6 +70,7 @@
                 const audioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
                 const fileName = generateFileName();
                 sendAudioData(audioBlob, fileName);
+                sendWordData("mot1"); // Envoie le mot "mot1" au Webhook
                 audioChunks.length = 0;
                 isRecording = false;
                 recordBtn.classList.remove('recording');
@@ -94,6 +95,15 @@
     fetch(serverUrl, { method: "POST", body:  formData})
         .then(response => console.log(`Audio data (${fileName}) sent to server.`))
         .catch(error => console.error("Error sending audio data to server: ", error));
+  }
+
+  function sendWordData(word) {
+    const serverUrl = "https://hook.eu1.make.com/jkrb4xjo4qfvm90krx56nhjca9t8ky7g"; // Utiliser le bon URL
+    const formData = new FormData();
+    formData.set('word', word);
+    fetch(serverUrl, { method: "POST", body:  formData})
+        .then(response => console.log(`Word (${word}) sent to server.`))
+        .catch(error => console.error("Error sending word data to server: ", error));
   }
 
   function generateFileName() {
