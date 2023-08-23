@@ -5,132 +5,106 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎙️</text></svg>" />
     <title>Record and Send Voice Memo</title>
-    <style>
-            body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f0f0f0;
-        }
-
-        .record-button {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            background-color: #2e5aa3;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-            transition: background-color 0.2s;
-            position: relative;
-        }
-
-        .record-button.active {
-            background-color: #c93d3d;
-        }
-
-        .record-icon {
-            width: 50px;
-            height: 50px;
-            fill: white;
-        }
-
-        .recording-indicator {
-            width: 20px;
-            height: 20px;
-            background-color: #941e1e;
-            position: absolute;
-            bottom: -5px;
-            right: -5px;
-            border-radius: 50%;
-            display: none;
-        }
-
-        .record-button.active .recording-indicator {
-            display: block;
-        }
-    </style>
 </head>
 <body>
-    <div class="record-button">
-        <svg class="microphone-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-            <path d="M12 2c3.9 0 7 3.1 7 7v6c0 3.9-3.1 7-7 7s-7-3.1-7-7v-6c0-3.9 3.1-7 7-7zm-1 13h-1v2h1v-2zm2 0h-1v2h1v-2zm2 0h-1v2h1v-2z"/>
-        </svg>
-    </div>
-</body>
+    <div>
+    <h2 style="display: none;">ICOPE</h2>
+    <button id="recordBtn" class="record-button">
+      <img src="https://github.com/IgorGiustiFede/ICOPE/raw/afd76fde9f3d8c10049c5501cb5670803ada72b2/image%20micro-modified.png" alt="Microphone" class="microphone-icon">
+    </button>
+    <audio id="audio" controls style="display: none;"></audio>
+</div>
+
+<style>
+  .record-button {
+    background-color: #4285f4;
+    border: none;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+
+  .record-button.recording {
+    background-color: #d32f2f;
+  }
+
+  .microphone-icon {
+    width: 40px;
+    height: 40px;
+  }
+</style>
+
 <script>
-    const recordBtn = document.getElementById('recordBtn');
-    const audioChunks = [];
-    let recorder;
-    let audioStream;
-    const recordButton = document.getElementById('recordButton');
-    let isRecording = false;
+  const recordBtn = document.getElementById('recordBtn');
+  const audio = document.getElementById('audio');
+  let recorder;
+  let audioStream;
+  let isRecording = false;
 
-    function startRecording() {
-        navigator.mediaDevices.getUserMedia({ audio: true })
-            .then(stream => {
-                audioStream = stream;
-                recorder = new MediaRecorder(stream);
-
-                recorder.addEventListener('dataavailable', (event) => {
-                    audioChunks.push(event.data);
-                });
-
-                recorder.addEventListener('stop', () => {
-                    const audioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
-                    const fileName = generateFileName();
-                    sendAudioData(audioBlob, fileName);
-                });
-
-                recorder.start();
-                recordBtn.classList.add('recording');
-            })
-            .catch(err => console.error(err));
+  function toggleRecording() {
+    if (isRecording) {
+      stopRecording();
+    } else {
+      startRecording();
     }
+  }
 
-    function stopRecording() {
-        recorder.stop();
-        audioStream.getAudioTracks().forEach(track => track.stop());
-        recordBtn.classList.remove('recording');
-    }
+  function startRecording() {
+    navigator.mediaDevices.getUserMedia({ audio: true })
+        .then(stream => {
+            audioStream = stream;
+            recorder = new MediaRecorder(stream);
+            const audioChunks = [];
 
-    function sendAudioData(data, fileName) {
-        const serverUrl = "https://hook.eu1.make.com/1y1ku32ezig5rezo6ab995olarcijhcx";
-        const formData = new FormData();
-        formData.set('file', data, fileName);
-        fetch(serverUrl, { method: "POST", body: formData })
-            .then(response => console.log(`Audio data (${fileName}) sent to server.`))
-            .catch(error => console.error("Error sending audio data to server: ", error));
-    }
+            recorder.addEventListener('dataavailable', (event) => {
+                audioChunks.push(event.data);
+            });
 
-    function generateFileName() {
-        const date = new Date();
-        const year = date.getFullYear();
-        const month = (date.getMonth() + 1).toString().padStart(2, '0');
-        const day = date.getDate().toString().padStart(2, '0');
-        const timestamp = date.getTime().toString();
-        return `${year}-${month}-${day}-${timestamp}.mp3`;
-    }
-
-    recordBtn.addEventListener('click', () => {
-        if (recorder && recorder.state === 'recording') {
-            stopRecording();
-        } else {
-            startRecording();
-        }
-   
-        recordButton.addEventListener('click', () => {
-            if (!isRecording) {
-                recordButton.classList.add('active');
-                isRecording = true;
-            } else {
-                recordButton.classList.remove('active');
+            recorder.addEventListener('stop', () => {
+                const audioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
+                const fileName = generateFileName();
+                sendAudioData(audioBlob, fileName);
+                audioChunks.length = 0;
                 isRecording = false;
-            }
-     });
+                recordBtn.classList.remove('recording');
+            });
+
+            recorder.start();
+            isRecording = true;
+            recordBtn.classList.add('recording');
+        })
+        .catch(err => console.error(err));
+  }
+
+  function stopRecording() {
+    recorder.stop();
+    audioStream.getAudioTracks().forEach(track => track.stop());
+  }
+
+  function sendAudioData(data, fileName) {
+    const serverUrl = "https://hook.eu1.make.com/1y1ku32ezig5rezo6ab995olarcijhcx";
+    const formData = new FormData();
+    formData.set('file', data, fileName);
+    fetch(serverUrl, { method: "POST", body:  formData})
+        .then(response => console.log(`Audio data (${fileName}) sent to server.`))
+        .catch(error => console.error("Error sending audio data to server: ", error));
+  }
+
+  function generateFileName() {
+    const date = new Date();
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    const timestamp = date.getTime().toString();
+    return `${year}-${month}-${day}-${timestamp}.mp3`;
+  }
+
+  recordBtn.addEventListener('click', toggleRecording);
 </script>
 </html>
