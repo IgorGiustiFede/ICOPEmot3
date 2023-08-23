@@ -7,34 +7,45 @@
     <title>Record and Send Voice Memo</title>
     <style>
         body {
-            margin: 0;
             display: flex;
-            align-items: center;
             justify-content: center;
+            align-items: center;
             height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
         }
 
-        #recordBtn {
-            background-color: blue;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
+        .record-button {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-color: #2e5aa3;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             cursor: pointer;
-            font-size: 16px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.2s;
         }
 
-        #recordBtn.recording {
-            background-color: red;
+        .record-button:hover {
+            background-color: #1c3a6d;
+        }
+
+        .microphone-icon {
+            width: 40px;
+            height: 40px;
+            fill: white;
         }
     </style>
 </head>
 <body>
-    <button id="recordBtn">
-        🎙️ Record
-    </button>
+    <div class="record-button">
+        <svg class="microphone-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M12 2c3.9 0 7 3.1 7 7v6c0 3.9-3.1 7-7 7s-7-3.1-7-7v-6c0-3.9 3.1-7 7-7zm-1 13h-1v2h1v-2zm2 0h-1v2h1v-2zm2 0h-1v2h1v-2z"/>
+        </svg>
+    </div>
 </body>
-
 <script>
     const recordBtn = document.getElementById('recordBtn');
     const audioChunks = [];
