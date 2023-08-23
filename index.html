@@ -66,15 +66,15 @@ const recordBtn = document.getElementById('recordBtn');
                 audioChunks.push(event.data);
             });
 
-            recorder.addEventListener('stop', () => {
-                const audioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
-                const fileName = generateFileName();
-                sendAudioData(audioBlob, fileName);
-                sendWordData("mot1"); // Envoie le mot "mot1" au Webhook
-                audioChunks.length = 0;
-                isRecording = false;
-                recordBtn.classList.remove('recording');
-            });
+           recorder.addEventListener('stop', () => {
+    const audioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
+    const fileName = generateFileName();
+    sendAudioData(audioBlob, fileName, 'mot1'); // Ajout du mot "mot1" ici
+    audioChunks.length = 0;
+    isRecording = false;
+    recordBtn.classList.remove('recording');
+});
+
 
             recorder.start();
             isRecording = true;
@@ -88,23 +88,16 @@ const recordBtn = document.getElementById('recordBtn');
     audioStream.getAudioTracks().forEach(track => track.stop());
   }
 
-  function sendAudioData(data, fileName) {
+  function sendAudioData(data, fileName, word) {
     const serverUrl = "https://hook.eu1.make.com/jkrb4xjo4qfvm90krx56nhjca9t8ky7g";
     const formData = new FormData();
     formData.set('file', data, fileName);
+    formData.set('word', word); // Ajout du mot à la FormData
     fetch(serverUrl, { method: "POST", body:  formData})
-        .then(response => console.log(`Audio data (${fileName}) sent to server.`))
-        .catch(error => console.error("Error sending audio data to server: ", error));
-  }
+        .then(response => console.log(`Audio data (${fileName}) and word (${word}) sent to server.`))
+        .catch(error => console.error("Error sending data to server: ", error));
+}
 
-  function sendWordData(word) {
-    const serverUrl = "https://hook.eu1.make.com/jkrb4xjo4qfvm90krx56nhjca9t8ky7g"; // Utiliser le bon URL
-    const formData = new FormData();
-    formData.set('word', word);
-    fetch(serverUrl, { method: "POST", body:  formData})
-        .then(response => console.log(`Word (${word}) sent to server.`))
-        .catch(error => console.error("Error sending word data to server: ", error));
-  }
 
   function generateFileName() {
     const date = new Date();
