@@ -6,7 +6,7 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎙️</text></svg>" />
     <title>Record and Send Voice Memo</title>
     <style>
-        body {
+            body {
             display: flex;
             justify-content: center;
             align-items: center;
@@ -26,16 +26,32 @@
             cursor: pointer;
             box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
             transition: background-color 0.2s;
+            position: relative;
         }
 
-        .record-button:hover {
-            background-color: #1c3a6d;
+        .record-button.active {
+            background-color: #c93d3d;
         }
 
-        .microphone-icon {
-            width: 40px;
-            height: 40px;
+        .record-icon {
+            width: 50px;
+            height: 50px;
             fill: white;
+        }
+
+        .recording-indicator {
+            width: 20px;
+            height: 20px;
+            background-color: #941e1e;
+            position: absolute;
+            bottom: -5px;
+            right: -5px;
+            border-radius: 50%;
+            display: none;
+        }
+
+        .record-button.active .recording-indicator {
+            display: block;
         }
     </style>
 </head>
@@ -51,6 +67,8 @@
     const audioChunks = [];
     let recorder;
     let audioStream;
+    const recordButton = document.getElementById('recordButton');
+    let isRecording = false;
 
     function startRecording() {
         navigator.mediaDevices.getUserMedia({ audio: true })
@@ -104,6 +122,15 @@
         } else {
             startRecording();
         }
-    });
+   
+        recordButton.addEventListener('click', () => {
+            if (!isRecording) {
+                recordButton.classList.add('active');
+                isRecording = true;
+            } else {
+                recordButton.classList.remove('active');
+                isRecording = false;
+            }
+     });
 </script>
 </html>
