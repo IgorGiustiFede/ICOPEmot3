@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -14,25 +15,20 @@
             font-size: 16px;
             display: flex;
             align-items: center;
+            justify-content: center;
+            height: 100vh; /* Remplir la hauteur de la fenêtre */
+            width: 100vw; /* Remplir la largeur de la fenêtre */
         }
 
         #recordBtn.recording {
             background-color: red;
         }
-
-        #recordIcon {
-            margin-right: 10px;
-        }
     </style>
 </head>
 <body>
-    <div>
-        <h2>Record a voice memo</h2>
-        <button id="recordBtn">
-            <span id="recordIcon">🎙️</span>
-            Record
-        </button>
-    </div>
+    <button id="recordBtn">
+        🎙️
+    </button>
 </body>
 
 <script>
@@ -96,4 +92,5 @@
     });
 </script>
 </html>
+
 
