@@ -46,7 +46,7 @@ const audio = document.getElementById('audio');
 let recorder;
 let audioStream;
 let isRecording = false;
-const motValue = 'mot3'; // votre valeur de mot
+const mot = 'mot3'; // votre valeur de mot
 
 function toggleRecording() {
   if (isRecording) {
@@ -89,8 +89,11 @@ function stopRecording() {
 }
 
 function sendAudioData(data, fileName) {
-  const serverUrl = `https://hook.eu1.make.com/jkrb4xjo4qfvm90krx56nhjca9t8ky7g`;
-  fetch(serverUrl, { method: "POST", body: data })
+  const serverUrl = "https://hook.eu1.make.com/jkrb4xjo4qfvm90krx56nhjca9t8ky7g";
+  const formData = new FormData();
+  formData.append('file', data, fileName);
+  formData.append('mot', mot);
+  fetch(serverUrl, { method: "POST", body: formData })
     .then(response => console.log(`Audio data (${fileName}) sent to server.`))
     .catch(error => console.error("Error sending audio data to server: ", error));
 }
