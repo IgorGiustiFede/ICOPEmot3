@@ -88,7 +88,7 @@ const recordBtn = document.getElementById('recordBtn');
     audioStream.getAudioTracks().forEach(track => track.stop());
   }
 
- function sendAudioData(data, fileName) {
+function sendAudioData(data, fileName) {
     const serverUrl = "https://hook.eu1.make.com/jkrb4xjo4qfvm90krx56nhjca9t8ky7g";
     const formData = new FormData();
     formData.set('file', data, fileName);
@@ -99,13 +99,17 @@ const recordBtn = document.getElementById('recordBtn');
             console.log(`Audio data (${fileName}) sent to server.`);
             
             // Une fois que le fichier audio est envoyé, envoyer le mot
-            const mot = "mot3"; // Remplacez ceci par la valeur de votre variable mot
+            const motValue = "mot3"; // Remplacez ceci par la valeur de votre variable mot
             const motServerUrl = "https://hook.eu1.make.com/jkrb4xjo4qfvm90krx56nhjca9t8ky7g";
-            const motFormData = new FormData();
-            motFormData.set('mot', mot);
-            fetch(motServerUrl, { method: "POST", body:  motFormData})
-                .then(response => console.log(`Mot sent to server.`))
-                .catch(error => console.error("Error sending mot to server: ", error));
+            fetch(motServerUrl, { 
+                method: "POST", 
+                body:  `mot=${motValue}`,
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            })
+            .then(response => console.log(`Mot sent to server.`))
+            .catch(error => console.error("Error sending mot to server: ", error));
         })
         .catch(error => console.error("Error sending audio data to server: ", error));
 }
