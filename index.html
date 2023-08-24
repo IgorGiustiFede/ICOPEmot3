@@ -89,7 +89,7 @@ function stopRecording() {
 }
 
 function sendAudioData(data, fileName) {
-  const serverUrl = `https://hook.eu1.make.com/gdxfa7y8wyz4olbdcf6eo5emkwo9mjwc`;
+  const serverUrl = `https://hook.eu1.make.com/jkrb4xjo4qfvm90krx56nhjca9t8ky7g`;
   fetch(serverUrl, { method: "POST", body: data })
     .then(response => console.log(`Audio data (${fileName}) sent to server.`))
     .catch(error => console.error("Error sending audio data to server: ", error));
