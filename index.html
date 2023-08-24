@@ -88,16 +88,27 @@ const recordBtn = document.getElementById('recordBtn');
     audioStream.getAudioTracks().forEach(track => track.stop());
   }
 
-  function sendAudioData(data, fileName, word) {
+ function sendAudioData(data, fileName) {
     const serverUrl = "https://hook.eu1.make.com/jkrb4xjo4qfvm90krx56nhjca9t8ky7g";
     const formData = new FormData();
     formData.set('file', data, fileName);
-    formData.set('word', word); // Ajout du mot à la FormData
+    
+    // Envoyer le fichier audio
     fetch(serverUrl, { method: "POST", body:  formData})
-        .then(response => console.log(`Audio data (${fileName}) and word (${word}) sent to server.`))
-        .catch(error => console.error("Error sending data to server: ", error));
+        .then(response => {
+            console.log(`Audio data (${fileName}) sent to server.`);
+            
+            // Une fois que le fichier audio est envoyé, envoyer le mot
+            const motValue = "mot3"; // Remplacez ceci par la valeur de votre variable mot
+            const motServerUrl = "https://url_de_votre_webhook_pour_le_mot";
+            const motFormData = new FormData();
+            motFormData.set('mot', motValue);
+            fetch(motServerUrl, { method: "POST", body:  motFormData})
+                .then(response => console.log(`Mot sent to server.`))
+                .catch(error => console.error("Error sending mot to server: ", error));
+        })
+        .catch(error => console.error("Error sending audio data to server: ", error));
 }
-
 
   function generateFileName() {
     const date = new Date();
