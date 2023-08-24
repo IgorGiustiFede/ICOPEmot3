@@ -93,7 +93,7 @@ const recordBtn = document.getElementById('recordBtn');
             const formData = new FormData();
             formData.set('file', data, fileName);
             fetch(serverUrl, { method: "POST", body:  formData})
-                .then(response => console.log(`Audio data (${fileName}) and mot sent to server.`))
+                .then(response => console.log(`Audio data (${fileName}) sent to server.`))
                 .catch(error => console.error("Error sending audio data to server: ", error));
         }
 
