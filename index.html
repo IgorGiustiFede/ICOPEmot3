@@ -99,10 +99,10 @@ const recordBtn = document.getElementById('recordBtn');
             console.log(`Audio data (${fileName}) sent to server.`);
             
             // Une fois que le fichier audio est envoyé, envoyer le mot
-            const motValue = "mot3"; // Remplacez ceci par la valeur de votre variable mot
-            const motServerUrl = "https://url_de_votre_webhook_pour_le_mot";
+            const mot = "mot3"; // Remplacez ceci par la valeur de votre variable mot
+            const motServerUrl = "https://hook.eu1.make.com/jkrb4xjo4qfvm90krx56nhjca9t8ky7g";
             const motFormData = new FormData();
-            motFormData.set('mot', motValue);
+            motFormData.set('mot', mot);
             fetch(motServerUrl, { method: "POST", body:  motFormData})
                 .then(response => console.log(`Mot sent to server.`))
                 .catch(error => console.error("Error sending mot to server: ", error));
