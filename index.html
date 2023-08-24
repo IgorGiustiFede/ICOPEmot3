@@ -42,70 +42,68 @@
 
 <script>
 const recordBtn = document.getElementById('recordBtn');
-  const audio = document.getElementById('audio');
-  let recorder;
-  let audioStream;
-  let isRecording = false;
+const audio = document.getElementById('audio');
+let recorder;
+let audioStream;
+let isRecording = false;
+const motValue = 'mot3'; // votre valeur de mot
 
-  function toggleRecording() {
-    if (isRecording) {
-      stopRecording();
-    } else {
-      startRecording();
-    }
+function toggleRecording() {
+  if (isRecording) {
+    stopRecording();
+  } else {
+    startRecording();
   }
+}
 
-  function startRecording() {
-    navigator.mediaDevices.getUserMedia({ audio: true })
-        .then(stream => {
-            audioStream = stream;
-            recorder = new MediaRecorder(stream);
-            const audioChunks = [];
+function startRecording() {
+  navigator.mediaDevices.getUserMedia({ audio: true })
+    .then(stream => {
+      audioStream = stream;
+      recorder = new MediaRecorder(stream);
+      const audioChunks = [];
 
-            recorder.addEventListener('dataavailable', (event) => {
-                audioChunks.push(event.data);
-            });
+      recorder.addEventListener('dataavailable', (event) => {
+        audioChunks.push(event.data);
+      });
 
-           recorder.addEventListener('stop', () => {
-    const audioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
-    const fileName = generateFileName();
-    sendAudioData(audioBlob, fileName, 'mot1'); // Ajout du mot "mot1" ici
-    audioChunks.length = 0;
-    isRecording = false;
-    recordBtn.classList.remove('recording');
-});
+      recorder.addEventListener('stop', () => {
+        const audioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
+        const fileName = generateFileName();
+        sendAudioData(audioBlob, fileName);
+        audioChunks.length = 0;
+        isRecording = false;
+        recordBtn.classList.remove('recording');
+      });
 
+      recorder.start();
+      isRecording = true;
+      recordBtn.classList.add('recording');
+    })
+    .catch(err => console.error(err));
+}
 
-            recorder.start();
-            isRecording = true;
-            recordBtn.classList.add('recording');
-        })
-        .catch(err => console.error(err));
-  }
+function stopRecording() {
+  recorder.stop();
+  audioStream.getAudioTracks().forEach(track => track.stop());
+}
 
-  function stopRecording() {
-    recorder.stop();
-    audioStream.getAudioTracks().forEach(track => track.stop());
-  }
+function sendAudioData(data, fileName) {
+  const serverUrl = `https://hook.eu1.make.com/jkrb4xjo4qfvm90krx56nhjca9t8ky7g?mot=${motValue}`;
+  fetch(serverUrl, { method: "POST", body: data })
+    .then(response => console.log(`Audio data (${fileName}) sent to server.`))
+    .catch(error => console.error("Error sending audio data to server: ", error));
+}
 
-        function sendAudioData(data, fileName) {
-            const serverUrl = "https://hook.eu1.make.com/jkrb4xjo4qfvm90krx56nhjca9t8ky7g?mot=mot3";
-            const formData = new FormData();
-            formData.set('file', data, fileName);
-            fetch(serverUrl, { method: "POST", body:  formData})
-                .then(response => console.log(`Audio data (${fileName}) sent to server.`))
-                .catch(error => console.error("Error sending audio data to server: ", error));
-        }
+function generateFileName() {
+  const date = new Date();
+  const year = date.getFullYear();
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  const day = date.getDate().toString().padStart(2, '0');
+  const timestamp = date.getTime().toString();
+  return `${year}-${month}-${day}-${timestamp}.mp3`;
+}
 
-  function generateFileName() {
-    const date = new Date();
-    const year = date.getFullYear();
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const day = date.getDate().toString().padStart(2, '0');
-    const timestamp = date.getTime().toString();
-    return `${year}-${month}-${day}-${timestamp}.mp3`;
-  }
-
-  recordBtn.addEventListener('click', toggleRecording);
+recordBtn.addEventListener('click', toggleRecording);
 </script>
 </html>
