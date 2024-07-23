@@ -1,169 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎙️</text></svg>" />
-    <title>Record and Send Voice Memo</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speech Recognition Example</title>
 </head>
 <body>
-    <div>
-    <h2>Record a voice memo</h2>
-    <button id="startBtn">Start Recording</button>
-    <button id="stopBtn" disabled>Stop Recording</button>
-    <audio id="audio" controls></audio>
-</div>
 
-
-</body>
+<button onclick="startDictation()">Start Dictation</button>
+<form id="labnol">
+    <input type="text" id="transcript" placeholder="Speech will be transcribed here...">
+    <div id="response"></div>
+</form>
 
 <script>
-   const startBtn = document.getElementById('startBtn');
-const stopBtn = document.getElementById('stopBtn');
-const audio = document.getElementById('audio');
-let recorder;
-let audioStream;
+function startDictation() {
+  var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
-function startRecording() {
-    navigator.mediaDevices.getUserMedia({ audio: true })
-        .then(stream => {
-            audioStream = stream;
-            recorder = new MediaRecorder(stream);
-            const audioChunks = [];
+  if (SpeechRecognition) {
+    var recognition = new SpeechRecognition();
 
-            recorder.addEventListener('dataavailable', (event) => {
-                audioChunks.push(event.data);
-            });
+    recognition.continuous = false;
+    recognition.interimResults = false;
 
-            recorder.addEventListener('stop', () => {
-                const audioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
-                const fileName = generateFileName();
-                sendAudioData(audioBlob, fileName);
-                const audioUrl = URL.createObjectURL(audioBlob);
-                audio.src = audioUrl;
-                audio.controls = true;
-            });
+    recognition.lang = "fr-FR";
+    recognition.start();
 
-            recorder.start();
-            startBtn.disabled = true;
-            stopBtn.disabled = false;
-        })
-        .catch(err => console.error(err));
+    recognition.onresult = function(e) {
+      // Mettre à jour le champ transcript avec le texte reconnu
+      document.getElementById('transcript').value = e.results[0][0].transcript;
+      recognition.stop();
+      document.getElementById('labnol').submit();
+    };
+
+    recognition.onerror = function(e) {
+      recognition.stop();
+    };
+  } else {
+    console.log("Speech Recognition not supported in this browser.");
+  }
 }
 
-function stopRecording() {
-    recorder.stop();
-    audioStream.getAudioTracks().forEach(track => track.stop());
-    startBtn.disabled = false;
-    stopBtn.disabled = true;
+
+
+
+function makeResponse() {
+  var text = document.getElementById("transcript");
+  var res = document.getElementById("response");
+
+  // Mettre à jour le champ texte avec le résultat de la transcription
+  res.innerHTML = text.value;
 }
 
-function sendAudioData(data, fileName) {
-    const serverUrl = "https://hook.eu1.make.com/8lkm16qv5lhtcrr7589u88onya70uq6x";
-    const formData = new FormData();
-    formData.set('file', data, fileName);
-    fetch(serverUrl, { method: "POST", body:  formData})
-        .then(response => console.log(`Audio data (${fileName}) sent to server.`))
-        .catch(error => console.error("Error sending audio data to server: ", error));
-}
-
-function generateFileName() {
-  const date = new Date();
-  const year = date.getFullYear();
-  const month = (date.getMonth() + 1).toString().padStart(2, '0');
-  const day = date.getDate().toString().padStart(2, '0');
-  const timestamp = date.getTime().toString();
-  return `${year}-${month}-${day}-${timestamp}.mp3`;
-}
-
-startBtn.addEventListener('click', startRecording);
-stopBtn.addEventListener('click', stopRecording);
-
-
-
+// Déclenche makeResponse toutes les secondes (ou ajustez la fréquence selon vos besoins)
+var t = setInterval(makeResponse, 1000);
 </script>
-</html><!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎙️</text></svg>" />
-    <title>Record and Send Voice Memo</title>
-</head>
-<body>
-    <div>
-    <h2>Record a voice memo</h2>
-    <button id="startBtn">Start Recording</button>
-    <button id="stopBtn" disabled>Stop Recording</button>
-    <audio id="audio" controls></audio>
-</div>
-
 
 </body>
-
-<script>
-   const startBtn = document.getElementById('startBtn');
-const stopBtn = document.getElementById('stopBtn');
-const audio = document.getElementById('audio');
-let recorder;
-let audioStream;
-
-function startRecording() {
-    navigator.mediaDevices.getUserMedia({ audio: true })
-        .then(stream => {
-            audioStream = stream;
-            recorder = new MediaRecorder(stream);
-            const audioChunks = [];
-
-            recorder.addEventListener('dataavailable', (event) => {
-                audioChunks.push(event.data);
-            });
-
-            recorder.addEventListener('stop', () => {
-                const audioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
-                const fileName = generateFileName();
-                sendAudioData(audioBlob, fileName);
-                const audioUrl = URL.createObjectURL(audioBlob);
-                audio.src = audioUrl;
-                audio.controls = true;
-            });
-
-            recorder.start();
-            startBtn.disabled = true;
-            stopBtn.disabled = false;
-        })
-        .catch(err => console.error(err));
-}
-
-function stopRecording() {
-    recorder.stop();
-    audioStream.getAudioTracks().forEach(track => track.stop());
-    startBtn.disabled = false;
-    stopBtn.disabled = true;
-}
-
-function sendAudioData(data, fileName) {
-    const serverUrl = "https://hook.eu1.make.com/8lkm16qv5lhtcrr7589u88onya70uq6x";
-    const formData = new FormData();
-    formData.set('file', data, fileName);
-    fetch(serverUrl, { method: "POST", body:  formData})
-        .then(response => console.log(`Audio data (${fileName}) sent to server.`))
-        .catch(error => console.error("Error sending audio data to server: ", error));
-}
-
-function generateFileName() {
-  const date = new Date();
-  const year = date.getFullYear();
-  const month = (date.getMonth() + 1).toString().padStart(2, '0');
-  const day = date.getDate().toString().padStart(2, '0');
-  const timestamp = date.getTime().toString();
-  return `${year}-${month}-${day}-${timestamp}.mp3`;
-}
-
-startBtn.addEventListener('click', startRecording);
-stopBtn.addEventListener('click', stopRecording);
-
-
-
-</script>
 </html>
